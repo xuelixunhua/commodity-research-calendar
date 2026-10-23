@@ -5,10 +5,22 @@ import {validateData,selectImpacts,saveEvent,groupEvents} from '../assets/model.
 const original=JSON.parse(readFileSync(new URL('../data/catalog.json',import.meta.url),'utf8'));
 const state={commodity:'电力',year:'all',region:'all',status:'all',module:'all',importance:'all',search:''};
 test('published database has valid references and consistent time precision',()=>validateData(original));
-test('unknown quarter stays unknown and plans never become actual observations',()=>{
+test('nuclear Q1 stays an expectation and process milestones are excluded',()=>{
  const plans=selectImpacts(original,{...state,status:'计划'});
- assert(plans.length>0);assert(plans.every(i=>i.event.quarter===0));
+ assert(plans.length>0);assert(plans.every(i=>i.event.quarter===1&&i.event.timing_basis.includes('预期')));
  assert(!selectImpacts(original,{...state,status:'已发生'}).some(i=>i.event.id==='E010'));
+ assert(!original.events.some(e=>['E007','E008','E009','E011'].includes(e.id)));
+});
+test('non-contiguous years are filtered independently and quarterly notes retain their source identity',()=>{
+ const result=selectImpacts(original,{...state,commodity:'甲醇',years:[2021,2023]});
+ assert(result.length>5);assert(result.every(i=>[2021,2023].includes(i.event.year)));
+ assert(original.events.filter(e=>e.id.startsWith('H-')).every(e=>e.record_type==='季度观察'&&e.source==='历史研究记录'));
+});
+test('national coal shock is shared by power and methanol through distinct factors',()=>{
+ const impacts=original.impacts.filter(i=>i.event_id==='E001');
+ assert(impacts.every(i=>i.region==='全国'));
+ assert(impacts.some(i=>i.commodity==='电力'&&i.factor_id==='power-coal'));
+ assert(impacts.some(i=>i.commodity==='甲醇'&&i.factor_id==='methanol-feedstock'));
 });
 test('priority and module belong to the impact, not the shared event',()=>{
  const all=selectImpacts(original,state),key=selectImpacts(original,{...state,importance:'重点'}),normal=selectImpacts(original,{...state,importance:'一般'});

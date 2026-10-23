@@ -5,6 +5,7 @@ export function validateData(data) {
     if (!Array.isArray(data[key])) throw Error(`缺少 ${key} 数据表。`);
   }
   if (!data.commodities.length || data.commodities.some(x=>typeof x!=='string'||!x.trim())) throw Error('品种列表不能为空。');
+  if(!data.events.length||!data.factors.length)throw Error('至少需要一个事件和研究因素。');
   if (new Set(data.commodities).size!==data.commodities.length) throw Error('品种名称重复。');
   const maps={};
   for (const key of ['events','impacts','factors','relations']) {
@@ -50,7 +51,8 @@ export function selectImpacts(data,state,ignoreImportance=false) {
   return data.impacts.filter(i=>{
     const e=events.get(i.event_id),f=factors.get(i.factor_id);
     if(i.commodity!==state.commodity) return false;
-    if(state.year!=='all'&&e.year!==Number(state.year))return false;
+    if(Array.isArray(state.years)){if(!state.years.includes(e.year))return false;}
+    else if(state.year!=='all'&&e.year!==Number(state.year))return false;
     // National/global context remains available under a regional scope.
     if(state.region!=='all'&&![state.region,'全国','全球'].includes(i.region))return false;
     if(state.status!=='all'&&e.status!==state.status)return false;

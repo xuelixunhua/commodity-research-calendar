@@ -12,23 +12,23 @@
 <body>
   <a class="skip" href="#workspace">跳至事件日历</a>
   <aside class="sidebar">
-    <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="32" height="32"><span>商品研究日历<small>COMMODITY CALENDAR</small></span></a>
+    <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="30" height="30"><span>商品研究日历</span></a>
     <div class="side-label">研究品种</div>
     <nav id="commodities" aria-label="研究品种"></nav>
     <div class="side-label dimensions-label">研究层次</div>
     <nav id="modules" aria-label="研究层次"></nav>
-    <div class="sidebar-bottom"><p>事实相连，影响各有路径。</p><a href="https://github.com/xuelixunhua/commodity-research-calendar" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a></div>
+    <div class="sidebar-bottom"><a href="https://github.com/xuelixunhua/commodity-research-calendar" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
   </aside>
   <main id="workspace">
-    <header class="page-header"><div><p class="eyebrow">供需 · 数据 · 宏观</p><h1 id="page-title">电力<span>事件日历</span></h1></div><div class="header-actions"><button id="manage" class="quiet">数据与协作</button><button id="add-event" class="primary">＋ 记录事件</button></div></header>
+    <header class="page-header"><h1 id="page-title">电力<span>研究日历</span></h1><div class="header-actions"><button id="manage" class="quiet">数据管理</button><button id="add-event" class="primary">＋ 记录</button></div></header>
     <div id="draft-notice" hidden></div>
     <section class="control-panel" aria-label="日历筛选">
-      <div class="filters"><label>年份<select id="year"></select></label><label>地区<select id="region"></select></label><label>状态<select id="status"><option value="all">全部状态</option><option>已发生</option><option>计划</option></select></label><label class="search-label"><span class="sr-only">搜索事件</span><input id="search" type="search" placeholder="搜索事件、因素或影响…"></label></div>
-      <div class="view-controls"><div class="segmented" id="view" aria-label="展示方式"><button data-view="matrix">季度矩阵</button><button data-view="list">事件列表</button><button data-view="relations">品种联动</button></div><div class="importance-control"><span>关注程度</span><div class="segmented" id="importance" aria-label="关注程度"><button data-importance="all">全部</button><button data-importance="重点">★ 重点</button><button data-importance="一般">一般</button></div></div></div>
+      <div class="view-controls"><div class="segmented" id="view" aria-label="展示方式"><button data-view="matrix">季度记录</button><button data-view="list">事件列表</button><button data-view="relations">品种联动</button></div><div class="quick-filters"><label class="sr-only" for="region">地区</label><select id="region"></select><label class="search-label"><span class="sr-only">搜索事件</span><input id="search" type="search" placeholder="搜索…"></label></div></div>
+      <div id="year-picker" class="year-picker" aria-label="选择年份"><div class="year-caption"><span>年份 <small>拖动选区 · 点击多选</small></span><div><button data-years="recent">近两年</button><button data-years="all">全部</button></div></div><div class="year-rail"><div id="year-marks"></div><input type="range" id="year-start" aria-label="起始年份" step="1"><input type="range" id="year-end" aria-label="结束年份" step="1"></div><div id="year-ticks"></div></div>
     </section>
-    <div class="result-toolbar"><p id="result-count" aria-live="polite">正在读取事件…</p><div class="matrix-options" id="matrix-options"><label><input type="checkbox" id="show-detail"> 展开影响</label><label><input type="checkbox" id="show-empty"> <span id="empty-label">显示全部因素</span></label></div></div>
+    <div class="result-toolbar"><p id="result-count" aria-live="polite">正在读取…</p><div class="result-actions" id="result-actions"><div class="segmented" id="importance" aria-label="关注程度"><button data-importance="all">全部</button><button data-importance="重点">★ 重点</button><button data-importance="一般">一般</button></div><label id="matrix-options"><input type="checkbox" id="show-empty"> 全部因素</label></div></div>
     <section id="content" aria-label="事件日历"><div class="empty">正在读取事件…</div></section>
-    <footer class="page-footer"><span>★ 重点由各品种的影响判断决定 · 点击因素查看机制与历史</span><button id="reset-filters" class="text-button">重置筛选</button></footer>
+    <footer class="page-footer"><span id="calendar-position"></span><button id="reset-filters" class="text-button">重置筛选</button></footer>
   </main>
   <dialog id="drawer" class="drawer" aria-labelledby="drawer-title"><div class="dialog-bar"><span id="drawer-eyebrow"></span><button data-close="drawer" class="icon-button" aria-label="关闭详情">×</button></div><div id="drawer-content"></div></dialog>
   <dialog id="editor" class="editor" aria-labelledby="editor-title"><div class="dialog-bar"><h2 id="editor-title">编辑事件</h2><button data-close="editor" class="icon-button" aria-label="关闭编辑">×</button></div><form id="event-form"></form></dialog>
