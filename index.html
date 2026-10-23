@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="按品种、供需因素和季度浏览商品市场事件，连接共同事实与不同品种的影响。">
+  <meta name="theme-color" content="#123d48">
+  <title>商品研究日历</title>
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#workspace">跳至事件日历</a>
+  <aside class="sidebar">
+    <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="32" height="32"><span>商品研究日历<small>COMMODITY CALENDAR</small></span></a>
+    <div class="side-label">研究品种</div>
+    <nav id="commodities" aria-label="研究品种"></nav>
+    <div class="side-label dimensions-label">研究层次</div>
+    <nav id="modules" aria-label="研究层次"></nav>
+    <div class="sidebar-bottom"><p>事实相连，影响各有路径。</p><a href="https://github.com/xuelixunhua/commodity-research-calendar" target="_blank" rel="noopener noreferrer">GitHub 项目 ↗</a></div>
+  </aside>
+  <main id="workspace">
+    <header class="page-header"><div><p class="eyebrow">供需 · 数据 · 宏观</p><h1 id="page-title">电力<span>事件日历</span></h1></div><div class="header-actions"><button id="manage" class="quiet">数据与协作</button><button id="add-event" class="primary">＋ 记录事件</button></div></header>
+    <div id="draft-notice" hidden></div>
+    <section class="control-panel" aria-label="日历筛选">
+      <div class="filters"><label>年份<select id="year"></select></label><label>地区<select id="region"></select></label><label>状态<select id="status"><option value="all">全部状态</option><option>已发生</option><option>计划</option></select></label><label class="search-label"><span class="sr-only">搜索事件</span><input id="search" type="search" placeholder="搜索事件、因素或影响…"></label></div>
+      <div class="view-controls"><div class="segmented" id="view" aria-label="展示方式"><button data-view="matrix">季度矩阵</button><button data-view="list">事件列表</button><button data-view="relations">品种联动</button></div><div class="importance-control"><span>关注程度</span><div class="segmented" id="importance" aria-label="关注程度"><button data-importance="all">全部</button><button data-importance="重点">★ 重点</button><button data-importance="一般">一般</button></div></div></div>
+    </section>
+    <div class="result-toolbar"><p id="result-count" aria-live="polite">正在读取事件…</p><div class="matrix-options" id="matrix-options"><label><input type="checkbox" id="show-detail"> 展开影响</label><label><input type="checkbox" id="show-empty"> <span id="empty-label">显示全部因素</span></label></div></div>
+    <section id="content" aria-label="事件日历"><div class="empty">正在读取事件…</div></section>
+    <footer class="page-footer"><span>★ 重点由各品种的影响判断决定 · 点击因素查看机制与历史</span><button id="reset-filters" class="text-button">重置筛选</button></footer>
+  </main>
+  <dialog id="drawer" class="drawer" aria-labelledby="drawer-title"><div class="dialog-bar"><span id="drawer-eyebrow"></span><button data-close="drawer" class="icon-button" aria-label="关闭详情">×</button></div><div id="drawer-content"></div></dialog>
+  <dialog id="editor" class="editor" aria-labelledby="editor-title"><div class="dialog-bar"><h2 id="editor-title">编辑事件</h2><button data-close="editor" class="icon-button" aria-label="关闭编辑">×</button></div><form id="event-form"></form></dialog>
+  <dialog id="data-dialog" class="data-dialog" aria-labelledby="data-title"><div class="dialog-bar"><h2 id="data-title">数据与协作</h2><button data-close="data-dialog" class="icon-button" aria-label="关闭数据与协作">×</button></div><div class="dialog-body"><p>事件事实保存一份，各品种分别记录所属因素、影响和关注程度。</p><div class="data-step"><b>1. 在页面修改</b><p>保存后立即更新当前浏览器的本地草稿，刷新仍保留。草稿尚未发布给其他人。</p></div><div class="data-step"><b>2. 导出与共同维护</b><p>导出完整数据，在 GitHub 上传替换 <code>data/catalog.json</code>，提交更改或 Pull Request。合并到 main 后自动更新网站。</p><div class="button-row"><button id="export-data" class="primary">导出 JSON</button><a class="button" href="https://github.com/xuelixunhua/commodity-research-calendar/upload/main/data" target="_blank" rel="noopener noreferrer">到 GitHub 上传 ↗</a></div></div><div class="data-step"><b>3. 继续已有草稿</b><p>导入 JSON 会替换本浏览器的数据，先导出可保留当前修改。</p><label class="button file-button">导入 JSON<input id="import-data" type="file" accept=".json,application/json"></label><p id="import-error" class="error" role="alert"></p></div><details><summary>恢复网站发布版</summary><p>放弃当前浏览器的全部草稿，重新使用网站数据。</p><button id="restore-data" class="danger">放弃本地草稿</button></details></div></dialog>
+  <div id="toast" role="status" hidden></div>
+  <noscript><p>请启用 JavaScript 以浏览和编辑事件日历。也可在 GitHub 查看 data/catalog.json。</p></noscript>
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>

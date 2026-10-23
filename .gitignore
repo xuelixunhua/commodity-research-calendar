@@ -7,3 +7,7 @@ __pycache__/
 .env
 *.db
 *.sqlite
+
+outputs/
+scripts/import_workbook.py
+requirements.txt
