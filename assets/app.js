@@ -9,7 +9,7 @@ const uid=prefix=>prefix+'-'+crypto.randomUUID();
 const factorById=id=>data.factors.find(f=>f.id===id);
 const option=(v,label,current)=>`<option value="${esc(v)}" ${String(v)===String(current)?'selected':''}>${esc(label??v)}</option>`;
 function toast(message){$('#toast').textContent=message;$('#toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').hidden=true,4200);}
-function syncUrl(){const p=new URLSearchParams();for(const[k,v]of Object.entries(state))if(v!==initial[k])p.set(k,String(v));history.replaceState(null,'',location.pathname+(p.size?'?'+p:'')+location.hash);}
+function syncUrl(){const p=new URLSearchParams();for(const[k,v]of Object.entries(state))if(v!==initial[k]||k==='view')p.set(k,String(v));history.replaceState(null,'',location.pathname+(p.size?'?'+p:'')+location.hash);}
 function readUrl(){const p=new URLSearchParams(location.search);for(const k of Object.keys(initial))if(p.has(k))state[k]=typeof initial[k]==='boolean'?p.get(k)==='true':p.get(k);if(!p.has('view')&&matchMedia('(max-width:760px)').matches)state.view='list';if(!data.commodities.includes(state.commodity))state.commodity=initial.commodity;if(!['all',...MODULES].includes(state.module))state.module='all';if(!['all','重点','一般'].includes(state.importance))state.importance='all';if(!['matrix','list','relations'].includes(state.view))state.view='matrix';if(!['all','已发生','计划'].includes(state.status))state.status='all';}
 function update(patch){Object.assign(state,patch);syncUrl();render();}
 function controls(){
