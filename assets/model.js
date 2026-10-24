@@ -24,6 +24,7 @@ export function validateData(data) {
     if (!['已发生','计划'].includes(e.status)) throw Error(`${e.id} 的状态无效。`);
     if(e.quarter===0&&e.period_scope!=='year')throw Error(`${e.id} 的非季度记录需要明确年度范围。`);
     if (e.url && !/^https?:\/\/[^\s]+$/i.test(e.url)) throw Error(`${e.id} 的来源链接应以 https:// 或 http:// 开头。`);
+    if(e.sources!==undefined && (!Array.isArray(e.sources)||e.sources.some(s=>!s||typeof s.title!=='string'||!s.title.trim()||typeof s.url!=='string'||!/^https?:\/\/[^\s]+$/i.test(s.url)))) throw Error(`${e.id} 的补充来源无效。`);
     for (const field of ['date','published']) {
       const val=e[field];
       if(val && (!/^\d{4}-\d{2}-\d{2}$/.test(val)||!Number.isFinite(Date.parse(val))||new Date(val).toISOString().slice(0,10)!==val)) throw Error(`${e.id} 的日期无效。`);

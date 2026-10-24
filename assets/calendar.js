@@ -1,4 +1,4 @@
-import {MODULES} from './model.js?v=20261024c';
+import {MODULES} from './model.js?v=20261024d';
 export const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 export function availableYears(data) {
