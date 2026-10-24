@@ -1,4 +1,5 @@
 .local/
+本地维护/
 tmp/
 node_modules/
 __pycache__/

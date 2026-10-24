@@ -1,4 +1,4 @@
-import {MODULES} from './model.js';
+import {MODULES} from './model.js?v=20261024b';
 export const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 export function availableYears(data) {
@@ -15,7 +15,7 @@ export function yearRange(years,start,end) {
 }
 export function eventChip(i,withPeriod=false) {
   const e=i.event;
-  return `<button class="event-chip ${i.importance==='重点'?'key':''} ${e.status==='计划'?'plan':''}" data-event="${e.id}"><span class="chip-title">${i.importance==='重点'?'<span class="key-star">★</span>':''}${esc(e.title)}</span><span class="chip-meta">${withPeriod?e.year+' Q'+e.quarter+' · ':''}${esc(i.region)}${e.status==='计划'?' · '+(e.timing_basis?'预期':'计划'):''}</span></button>`;
+  return `<button class="event-chip ${i.importance==='重点'?'key':''} ${e.status==='计划'?'plan':''}" data-event="${e.id}"><span class="chip-title">${i.importance==='重点'?'<span class="key-star">★</span>':''}${esc(e.title)}</span><span class="chip-meta">${withPeriod?e.year+(e.quarter?' Q'+e.quarter:' 全年')+' · ':''}${esc(i.region)}${e.status==='计划'?' · '+(e.timing_basis?'预期':'计划'):''}</span></button>`;
 }
 function panMarkup(label,start='左',end='右') {
   return `<div class="horizontal-pan" hidden><span>${start}</span><input type="range" min="0" max="100" value="0" step="1" aria-label="${label}"><span>${end}</span></div>`;
@@ -26,6 +26,8 @@ export function calendarMarkup(data,state,impacts,base) {
   let previous='';
   const rows=factors.map(f=>{
     const start=previous!==f.module;previous=f.module;
+    const annual=f.period_scope==='year'||base.some(i=>i.factor_id===f.id&&i.event.quarter===0);
+    if(annual)return `<tr class="annual-row" data-section="综述"><th class="factor-head" scope="row"><span class="module-name">综述</span><button data-factor="${f.id}">${esc(f.name)}</button></th>${state.years.map(year=>`<td colspan="4" data-year="${year}" data-period="year">${impacts.filter(i=>i.factor_id===f.id&&i.event.year===year&&i.event.quarter===0).map(i=>eventChip(i)).join('')}</td>`).join('')}</tr>`;
     return `<tr data-section="${f.module}" class="${start?'section-start':''}"><th class="factor-head" scope="row"><span class="module-name">${f.module}</span><button data-factor="${f.id}">${esc(f.name)}</button></th>${state.years.flatMap(year=>[1,2,3,4].map(q=>{
       const items=impacts.filter(i=>i.factor_id===f.id&&i.event.year===year&&i.event.quarter===q).sort((a,b)=>(a.importance==='重点'?0:1)-(b.importance==='重点'?0:1)||a.event.id.localeCompare(b.event.id));
       return `<td data-year="${year}" data-quarter="${q}" class="${q===1?'year-start':''}">${items.slice(0,2).map(i=>eventChip(i)).join('')}${items.length>2?`<button class="more-events" data-cell-factor="${f.id}" data-cell-year="${year}" data-cell-quarter="${q}">另 ${items.length-2} 条</button>`:''}</td>`;
@@ -34,7 +36,7 @@ export function calendarMarkup(data,state,impacts,base) {
   return `<div class="matrix-scroll" tabindex="0" aria-label="按年份分组的季度记录，可横向滚动"><table class="matrix year-matrix" style="--years:${state.years.length}"><colgroup><col class="factor-col">${state.years.flatMap(()=>[1,2,3,4].map(()=>'<col class="quarter-col">')).join('')}</colgroup><thead><tr><th rowspan="2" scope="col" class="factor-corner">研究因素</th>${state.years.map(y=>`<th colspan="4" class="year-heading" data-year-heading="${y}">${y}<span>${new Set(impacts.filter(i=>i.event.year===y).map(i=>i.event_id)).size} 条记录</span></th>`).join('')}</tr><tr>${state.years.flatMap(()=>[1,2,3,4].map(q=>`<th scope="col" class="quarter-heading ${q===1?'year-start':''}">Q${q}<small>${(q-1)*3+1}—${q*3}月</small></th>`)).join('')}</tr></thead><tbody>${rows}</tbody></table></div>${panMarkup('横向浏览季度记录',state.years[0],state.years.at(-1))}`;
 }
 
-const palettes={cost:'#287c72',demand:'#b46d3d',substitution:'#8061a2'};
+const palettes={cost:'#52678d',demand:'#a87846',substitution:'#8674a8'};
 const node=(id,name,role,x,y,commodity)=>({id,name,role,x,y,commodity});
 const layouts={
   '电力':{

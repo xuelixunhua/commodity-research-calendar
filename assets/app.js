@@ -1,10 +1,11 @@
-import {MODULES,validateData,selectImpacts,saveEvent,groupEvents} from './model.js';
-import {esc,eventChip,availableYears,recentYears,yearRange,calendarMarkup,relationMarkup} from './calendar.js';
+import {chainMarkup} from './chains.js?v=20261024b';
+import {MODULES,validateData,selectImpacts,saveEvent,groupEvents} from './model.js?v=20261024b';
+import {esc,eventChip,availableYears,recentYears,yearRange,calendarMarkup,relationMarkup} from './calendar.js?v=20261024b';
 const $=s=>document.querySelector(s);
 const repo='https://github.com/xuelixunhua/commodity-research-calendar';
 const storageKey='commodity-calendar-draft-v2';
 const initial={commodity:'电力',year:'all',years:[],region:'all',status:'all',module:'all',importance:'all',view:'matrix',search:'',empty:false};
-let state={...initial},data,published,baseHash,storedBase,loadedDraftRaw=null,hasDraft=false,editorDirty=false,editingId=null,drawerFactor=null,drawerPriority='all',toastTimer,activeRelation=null,scrollPosition={left:0,top:0};
+let state={...initial},data,published,baseHash,storedBase,loadedDraftRaw=null,hasDraft=false,editorDirty=false,editingId=null,drawerFactor=null,drawerPriority='all',toastTimer,activeRelation=null,chainMode='flow',scrollPosition={left:0,top:0};
 let panObserver;
 const uid=prefix=>prefix+'-'+crypto.randomUUID();
 const factorById=id=>data.factors.find(f=>f.id===id);
@@ -33,6 +34,7 @@ function readUrl(){
   if(!['all',...MODULES].includes(state.module))state.module='all';
   if(!['all','重点','一般'].includes(state.importance))state.importance='all';
   if(!['matrix','list','relations'].includes(state.view))state.view='matrix';
+  if(state.commodity==='宏观'&&state.view==='relations')state.view='matrix';
 }
 function update(patch){
   const viewport=$('.matrix-scroll');
@@ -43,6 +45,7 @@ function update(patch){
 function switchCommodity(commodity,view=state.view){
   const ids=new Set(data.impacts.filter(i=>i.commodity===commodity).map(i=>i.event_id));
   const hasYear=data.events.some(e=>ids.has(e.id)&&state.years.includes(e.year));
+  if(commodity==='宏观'&&view==='relations')view='matrix';
   update({commodity,view,years:hasYear?state.years:recentYears(data,commodity)});
 }
 function controls(){
@@ -64,6 +67,8 @@ function controls(){
   $('#search').value=state.search;$('#show-empty').checked=state.empty;
   document.querySelectorAll('[data-view]').forEach(el=>{el.classList.toggle('active',el.dataset.view===state.view);el.setAttribute('aria-pressed',el.dataset.view===state.view);});
   document.querySelectorAll('#importance button').forEach(el=>{el.classList.toggle('active',el.dataset.importance===state.importance);el.setAttribute('aria-pressed',el.dataset.importance===state.importance);});
+  document.querySelector('[data-view=relations]').hidden=state.commodity==='宏观';
+  if(state.commodity==='宏观'&&state.view==='relations')state.view='matrix';
   $('#matrix-options').hidden=state.view!=='matrix';
   $('#year-picker').hidden=state.view==='relations';
   $('#modules').hidden=state.view==='relations';
@@ -78,12 +83,12 @@ function render(){
   const graph=$('.graph-scroll'),graphLeft=graph&&graph.dataset.commodity===state.commodity?graph.scrollLeft:null;
   panObserver?.disconnect();
   controls();
-  const impacts=selectImpacts(data,state).filter(i=>i.event.quarter>0),base=selectImpacts(data,state,true).filter(i=>i.event.quarter>0);
+  const impacts=selectImpacts(data,state),base=selectImpacts(data,state,true);
   $('#result-count').textContent=new Set(impacts.map(i=>i.event_id)).size+' 条记录'+(state.region!=='all'?' · 含全国与全球背景':'');
   $('#calendar-position').textContent=state.view==='matrix'&&state.years.length>1?'横向滚动查看不同年份':'';
   if(state.view==='relations'){
     $('#result-count').textContent='产业联系';$('#calendar-position').textContent='';
-    $('#content').innerHTML=relationMarkup(data,state.commodity,activeRelation);
+    $('#content').innerHTML=chainMarkup(data,state.commodity,chainMode,activeRelation);
     const viewport=$('.graph-scroll');
     if(!viewport)return;
     viewport.dataset.commodity=state.commodity;
@@ -116,7 +121,7 @@ function renderList(impacts){
   const groups=groupEvents(impacts);
   $('#content').innerHTML=groups.length?`<div class="event-list">${[...state.years].reverse().map(year=>{
     const rows=groups.filter(g=>g.event.year===year);
-    return rows.length?`<section class="list-year"><h2>${year}<span>${rows.length} 条记录</span></h2>${rows.map(({event:e,impacts:items})=>`<article class="event-row"><div class="event-date"><strong>Q${e.quarter}</strong>${esc(e.region)}</div><div><button class="row-title" data-event="${e.id}">${esc(e.title)}</button><p>${esc(e.fact)}</p><div class="tag-row">${items.map(i=>`<span class="tag ${i.importance==='重点'?'key':''}">${i.importance==='重点'?'★ ':''}${i.factor.module} / ${esc(i.factor.name)}</span>`).join('')}${e.status==='计划'?'<span class="tag plan">预期</span>':''}</div></div></article>`).join('')}</section>`:'';
+    return rows.length?`<section class="list-year"><h2>${year}<span>${rows.length} 条记录</span></h2>${rows.map(({event:e,impacts:items})=>`<article class="event-row"><div class="event-date"><strong>${e.quarter?'Q'+e.quarter:'全年'}</strong>${esc(e.region)}</div><div><button class="row-title" data-event="${e.id}">${esc(e.title)}</button><p>${esc(e.fact)}</p><div class="tag-row">${items.map(i=>`<span class="tag ${i.importance==='重点'?'key':''}">${i.importance==='重点'?'★ ':''}${i.factor.module} / ${esc(i.factor.name)}</span>`).join('')}${e.status==='计划'?'<span class="tag plan">预期</span>':''}</div></div></article>`).join('')}</section>`:'';
   }).join('')}</div>`:emptyMarkup();
 }
 function showCell(factorId,year,quarter){
@@ -139,7 +144,7 @@ function showFactor(id,priority='all'){
   const f=factorById(id);if(!f)return;drawerFactor=id;drawerPriority=priority;
   const all=selectImpacts(data,{...initial,years:availableYears(data),commodity:f.commodity}).filter(i=>i.factor_id===id),items=all.filter(i=>priority==='all'||i.importance===priority).sort((a,b)=>b.event.year-a.event.year||b.event.quarter-a.event.quarter);
   $('#drawer-eyebrow').textContent=f.commodity+' / '+f.module;
-  $('#drawer-content').innerHTML=`<h2 id="drawer-title">${esc(f.name)}</h2><p class="definition">${esc(f.description)}</p><div class="segmented">${['all','重点','一般'].map(p=>`<button data-factor-priority="${p}" class="${p===priority?'active':''}">${p==='all'?'全部历史':p==='重点'?'★ 重点':'一般'} ${all.filter(i=>p==='all'||i.importance===p).length}</button>`).join('')}</div><div class="factor-history">${items.map(i=>chip(i,true)).join('')||'<p class="definition">暂无相应事件，可在“记录事件”中关联此因素。</p>'}</div><section class="detail-section"><h3>机制与跟踪指标</h3>${f.metrics?`<p>${esc(f.metrics)}</p>`:''}${f.drivers.map(d=>`<div class="driver"><b>${esc(d.factor)}</b><p>${esc(d.mechanism)}</p><small>指标：${esc(d.metrics)}<br>窗口：${esc(d.season)}<br>条件：${esc(d.boundary)}</small></div>`).join('')}</section><button class="primary" data-new-factor="${id}">＋ 在此因素下记录事件</button>`;
+  $('#drawer-content').innerHTML=`<h2 id="drawer-title">${esc(f.name)}</h2><p class="definition">${esc(f.description)}</p><div class="segmented">${['all','重点','一般'].map(p=>`<button data-factor-priority="${p}" class="${p===priority?'active':''}">${p==='all'?'全部历史':p==='重点'?'★ 重点':'一般'} ${all.filter(i=>p==='all'||i.importance===p).length}</button>`).join('')}</div><div class="factor-history">${items.map(i=>chip(i,true)).join('')||'<p class="definition">暂无相应事件，可在“记录事件”中关联此因素。</p>'}</div><section class="detail-section"><h3>机制与跟踪指标</h3>${f.metrics?`<p>${esc(f.metrics)}</p>`:''}${(f.reference_notes||[]).map(n=>`<div class="driver"><p>${esc(n.text)}</p><small>${esc(n.source)} · ${esc(n.boundary)}</small></div>`).join('')}${f.drivers.map(d=>`<div class="driver"><b>${esc(d.factor)}</b><p>${esc(d.mechanism)}</p><small>指标：${esc(d.metrics)}<br>窗口：${esc(d.season)}<br>条件：${esc(d.boundary)}</small></div>`).join('')}</section><button class="primary" data-new-factor="${id}">＋ 在此因素下记录事件</button>`;
   openDrawer();
 }
 function persist(next){
@@ -161,7 +166,7 @@ function openEditor(id=null,preFactor=null){
   const impacts=existing?data.impacts.filter(i=>i.event_id===id):[blankImpact(f)];
   if($('#drawer').open)$('#drawer').close();
   $('#editor-title').textContent=existing?'编辑事件与品种影响':'记录新事件';
-  $('#event-form').innerHTML=`<p class="form-note">事件正文由 ${[...new Set(impacts.map(i=>i.commodity))].map(esc).join('、')}共用。下方分别填写各品种的因素和影响。</p><div class="form-grid">${input('事件名称','title',e.title,'span-4','text',true)}${input('年份','year',e.year,'','number',true)}<label>季度<select name="quarter">${[1,2,3,4].map(q=>option(q,'Q'+q,e.quarter)).join('')}</select></label>${input('确切日期（可空）','date',e.date,'','date')}<label>状态<select name="status">${['已发生','计划'].map(s=>option(s,s,e.status)).join('')}</select></label>${input('时间描述','period',e.period,'span-2')}${input('事件地区','region',e.region)}${input('事件类型','category',e.category)}${textarea('发生了什么','fact',e.fact,'span-4',true)}${input('来源名称','source',e.source,'span-2')}${input('来源发布日期（可空）','published',e.published,'span-2','date')}${input('来源链接','url',e.url,'span-4','url')}</div><h3 class="form-section-title">各品种的影响 <button type="button" id="add-impact">＋ 关联品种 / 因素</button></h3><div id="impact-forms">${impacts.map(impactForm).join('')}</div><p id="form-error" class="error" role="alert"></p><div class="form-actions"><span class="hint">保存到本浏览器，发布需提交 GitHub</span><button type="button" data-close="editor">取消</button><button type="submit" class="primary">保存草稿</button></div>`;
+  $('#event-form').innerHTML=`<p class="form-note">事件正文由 ${[...new Set(impacts.map(i=>i.commodity))].map(esc).join('、')}共用。下方分别填写各品种的因素和影响。</p><div class="form-grid">${input('事件名称','title',e.title,'span-4','text',true)}${input('年份','year',e.year,'','number',true)}<label>季度<select name="quarter">${[0,1,2,3,4].map(q=>option(q,q?'Q'+q:'全年',e.quarter)).join('')}</select></label>${input('确切日期（可空）','date',e.date,'','date')}<label>状态<select name="status">${['已发生','计划'].map(s=>option(s,s,e.status)).join('')}</select></label>${input('时间描述','period',e.period,'span-2')}${input('事件地区','region',e.region)}${input('事件类型','category',e.category)}${textarea('发生了什么','fact',e.fact,'span-4',true)}${input('来源名称','source',e.source,'span-2')}${input('来源发布日期（可空）','published',e.published,'span-2','date')}${input('来源链接','url',e.url,'span-4','url')}</div><h3 class="form-section-title">各品种的影响 <button type="button" id="add-impact">＋ 关联品种 / 因素</button></h3><div id="impact-forms">${impacts.map(impactForm).join('')}</div><p id="form-error" class="error" role="alert"></p><div class="form-actions"><span class="hint">保存到本浏览器，发布需提交 GitHub</span><button type="button" data-close="editor">取消</button><button type="submit" class="primary">保存草稿</button></div>`;
   editorDirty=false;$('#editor').showModal();$('#editor').scrollTop=0;
 }
 function blankImpact(f){return {id:uid('I'),event_id:editingId,commodity:f.commodity,factor_id:f.id,region:state.region==='all'?'全国':state.region,importance:'一般',topic:'',impact:'',metric:'',condition:'',window:'',reason:''};}
@@ -178,9 +183,11 @@ async function boot(){
   }catch(err){$('#result-count').textContent='数据暂不可用';$('#content').innerHTML=`<div class="empty"><strong>无法载入事件日历</strong>${esc(err.message)}<br><a href="${repo}">在 GitHub 查看数据 ↗</a></div>`;}
 }
 document.addEventListener('click',async ev=>{
+  const chainTarget=ev.target.closest('[data-chain-node],[data-chain-mode]');
+  if(chainTarget){if(chainTarget.dataset.chainMode){chainMode=chainTarget.dataset.chainMode;activeRelation=null;}else activeRelation=chainTarget.dataset.chainNode;render();return;}
   const graphTarget=ev.target.closest('[data-graph-commodity],[data-relation]');
   if(graphTarget&&data){
-    if(graphTarget.dataset.graphCommodity){activeRelation=null;switchCommodity(graphTarget.dataset.graphCommodity,'relations');}
+    if(graphTarget.dataset.graphCommodity){activeRelation=null;chainMode='flow';switchCommodity(graphTarget.dataset.graphCommodity,'relations');}
     else {activeRelation=graphTarget.dataset.relation;render();}
     return;
   }
@@ -194,7 +201,7 @@ document.addEventListener('click',async ev=>{
   }
   if(b.dataset.years){update({years:b.dataset.years==='all'?availableYears(data):recentYears(data,state.commodity)});return;}
   if(b.dataset.cellFactor){showCell(b.dataset.cellFactor,Number(b.dataset.cellYear),Number(b.dataset.cellQuarter));return;}
-  if(b.dataset.commodity){activeRelation=null;switchCommodity(b.dataset.commodity);return;}
+  if(b.dataset.commodity){activeRelation=null;chainMode='flow';switchCommodity(b.dataset.commodity);return;}
   if(b.dataset.module){update({module:b.dataset.module});return;}
   if(b.dataset.view){update({view:b.dataset.view});return;}
   if(b.dataset.importance){update({importance:b.dataset.importance});return;}
@@ -230,6 +237,7 @@ $('#event-form').addEventListener('change',e=>{
 $('#event-form').addEventListener('submit',ev=>{
   ev.preventDefault();const form=ev.currentTarget,shared=form.querySelector('.form-grid');
   const previous=data.events.find(e=>e.id===editingId);const event={...(previous||{}),id:editingId};for(const el of shared.querySelectorAll('[name]'))event[el.name]=['year','quarter'].includes(el.name)?Number(el.value):el.value.trim();
+  event.period_scope=event.quarter===0?'year':'quarter';
   const impacts=[...form.querySelectorAll('.impact-edit')].map(fs=>{const i={id:fs.dataset.impactId,event_id:editingId};for(const el of fs.querySelectorAll('[name]'))i[el.name]=el.value.trim();return i;});
   try{persist(saveEvent(data,event,impacts));editorDirty=false;$('#editor').close();showEvent(event.id);toast('已保存草稿，关联品种同步更新。');}catch(err){$('#form-error').textContent=err.message;$('#form-error').scrollIntoView({block:'nearest'});}
 });

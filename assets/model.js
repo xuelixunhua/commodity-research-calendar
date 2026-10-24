@@ -1,4 +1,4 @@
-export const MODULES = ['供给', '需求', '数据', '宏观'];
+export const MODULES = ['综述', '供给', '需求', '数据', '宏观'];
 export function validateData(data) {
   if (!data || data.schema_version !== 2) throw Error('需要第 2 版事件数据格式。');
   for (const key of ['commodities', 'events', 'impacts', 'factors', 'relations']) {
@@ -22,6 +22,7 @@ export function validateData(data) {
     if (!e.title.trim()||!e.fact.trim()) throw Error(`${e.id} 缺少事件名称或事实。`);
     if (!Number.isInteger(e.year)||e.year<1900||e.year>2200||!Number.isInteger(e.quarter)||e.quarter<0||e.quarter>4) throw Error(`${e.id} 的年份或季度无效。`);
     if (!['已发生','计划'].includes(e.status)) throw Error(`${e.id} 的状态无效。`);
+    if(e.quarter===0&&e.period_scope!=='year')throw Error(`${e.id} 的非季度记录需要明确年度范围。`);
     if (e.url && !/^https?:\/\/[^\s]+$/i.test(e.url)) throw Error(`${e.id} 的来源链接应以 https:// 或 http:// 开头。`);
     for (const field of ['date','published']) {
       const val=e[field];
@@ -43,6 +44,15 @@ export function validateData(data) {
   }
   for(const e of data.events) if(!data.impacts.some(i=>i.event_id===e.id))throw Error(`${e.id} 至少需要关联一个品种因素。`);
   for(const r of data.relations)strings(r,['from','to','type','path','metric','boundary']);
+  for(const [commodity,views] of Object.entries(data.chains||{})){
+    if(!data.commodities.includes(commodity))throw Error('产业链品种不存在。');
+    for(const g of Object.values(views)){
+      const ids=new Set(g.nodes.map(n=>n.id));
+      if(ids.size!==g.nodes.length||!ids.has(g.focus))throw Error('产业链节点无效。');
+      for(const n of g.nodes)if(typeof n.id!=='string'||!/^[\w-]+$/.test(n.id)||![n.x,n.y].every(Number.isFinite)||!n.mechanism||!n.boundary)throw Error('产业链缺少有效节点、机制或位置。');
+      for(const e of g.edges)if(!ids.has(e.from_id)||!ids.has(e.to_id)||!['实物流','成本','需求','反馈'].includes(e.kind))throw Error('产业链箭头或引用无效。');
+    }
+  }
   return data;
 }
 export function selectImpacts(data,state,ignoreImportance=false) {
