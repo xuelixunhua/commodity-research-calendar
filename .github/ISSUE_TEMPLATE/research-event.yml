@@ -1,0 +1,35 @@
+name: 补充事件或研究证据
+description: 提供事实、来源、机制或后续验证
+title: '[研究补充] '
+body:
+  - type: input
+    id: subject
+    attributes:
+      label: 研究对象、地区与事实归属期
+      placeholder: 例如：辽宁电力，2026年Q3
+    validations:
+      required: true
+  - type: textarea
+    id: observation
+    attributes:
+      label: 发生了什么变化
+      description: 说明数值、单位、比较基线；纠错时附已有事件链接或 ID。
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: 来源与信息时间
+      description: 给出公开来源链接及发布日期；预期须注明形成时间，无法核验的内容请明确说明。
+    validations:
+      required: true
+  - type: textarea
+    id: mechanism
+    attributes:
+      label: 影响机制与成立条件
+      description: 它改变哪个产业变量，可能影响哪些对象，有哪些竞争解释？
+  - type: textarea
+    id: verification
+    attributes:
+      label: 验证指标与窗口
+      description: 什么证据会支持或推翻判断，何时能够核对？

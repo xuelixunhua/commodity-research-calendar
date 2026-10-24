@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="按品种、供需因素和季度浏览商品市场事件，连接共同事实与不同品种的影响。">
   <meta name="theme-color" content="#26334d">
-  <title>商品研究日历</title>
+  <title>事件数据库</title>
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="assets/style.css?v=20261024b">
+  <link rel="stylesheet" href="assets/style.css?v=20261024c">
 </head>
 <body>
   <a class="skip" href="#workspace">跳至事件日历</a>
   <aside class="sidebar">
-    <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="30" height="30"><span>商品研究日历</span></a>
-    <div class="side-label">研究品种</div>
-    <nav id="commodities" aria-label="研究品种"></nav>
+    <a class="brand" href="./"><img src="assets/icon.svg" alt="" width="30" height="30"><span>事件数据库</span></a>
+    <div class="side-label">研究对象</div>
+    <nav id="commodities" aria-label="研究对象"></nav>
     <div class="side-label dimensions-label">研究层次</div>
     <nav id="modules" aria-label="研究层次"></nav>
-    <div class="sidebar-bottom"><a href="https://github.com/xuelixunhua/commodity-research-calendar" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
+    <div class="sidebar-bottom"><a href="https://github.com/xuelixunhua/commodity-research-calendar/blob/main/docs/研究方法与协作规范.md" target="_blank" rel="noopener noreferrer">研究方法与参与 ↗</a><br><br><a href="https://github.com/xuelixunhua/commodity-research-calendar" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
   </aside>
   <main id="workspace">
     <header class="page-header"><h1 id="page-title">电力<span>研究日历</span></h1><div class="header-actions"><button id="manage" class="quiet">数据管理</button><button id="add-event" class="primary">＋ 记录</button></div></header>
@@ -35,6 +35,6 @@
   <dialog id="data-dialog" class="data-dialog" aria-labelledby="data-title"><div class="dialog-bar"><h2 id="data-title">数据与协作</h2><button data-close="data-dialog" class="icon-button" aria-label="关闭数据与协作">×</button></div><div class="dialog-body"><p>事件事实保存一份，各品种分别记录所属因素、影响和关注程度。</p><div class="data-step"><b>1. 在页面修改</b><p>保存后立即更新当前浏览器的本地草稿，刷新仍保留。草稿尚未发布给其他人。</p></div><div class="data-step"><b>2. 导出与共同维护</b><p>导出完整数据，在 GitHub 上传替换 <code>data/catalog.json</code>，提交更改或 Pull Request。合并到 main 后自动更新网站。</p><div class="button-row"><button id="export-data" class="primary">导出 JSON</button><a class="button" href="https://github.com/xuelixunhua/commodity-research-calendar/upload/main/data" target="_blank" rel="noopener noreferrer">到 GitHub 上传 ↗</a></div></div><div class="data-step"><b>3. 继续已有草稿</b><p>导入 JSON 会替换本浏览器的数据，先导出可保留当前修改。</p><label class="button file-button">导入 JSON<input id="import-data" type="file" accept=".json,application/json"></label><p id="import-error" class="error" role="alert"></p></div><details><summary>恢复网站发布版</summary><p>放弃当前浏览器的全部草稿，重新使用网站数据。</p><button id="restore-data" class="danger">放弃本地草稿</button></details></div></dialog>
   <div id="toast" role="status" hidden></div>
   <noscript><p>请启用 JavaScript 以浏览和编辑事件日历。也可在 GitHub 查看 data/catalog.json。</p></noscript>
-  <script type="module" src="assets/app.js?v=20261024b"></script>
+  <script type="module" src="assets/app.js?v=20261024c"></script>
 </body>
 </html>

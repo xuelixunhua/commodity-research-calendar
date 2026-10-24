@@ -1,4 +1,4 @@
-import {esc,relationMarkup} from './calendar.js?v=20261024b';
+import {esc,relationMarkup} from './calendar.js?v=20261024c';
 const colors={'实物流':'#52678d','成本':'#8d6b43','需求':'#8674a8','反馈':'#a45f66'};
 export function chainMarkup(data,commodity,mode='flow',selected=null){
  const chain=data.chains?.[commodity];

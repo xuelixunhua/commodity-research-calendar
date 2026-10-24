@@ -1,6 +1,6 @@
-import {chainMarkup} from './chains.js?v=20261024b';
-import {MODULES,validateData,selectImpacts,saveEvent,groupEvents} from './model.js?v=20261024b';
-import {esc,eventChip,availableYears,recentYears,yearRange,calendarMarkup,relationMarkup} from './calendar.js?v=20261024b';
+import {chainMarkup} from './chains.js?v=20261024c';
+import {MODULES,validateData,selectImpacts,saveEvent,groupEvents} from './model.js?v=20261024c';
+import {esc,eventChip,availableYears,recentYears,yearRange,calendarMarkup,relationMarkup} from './calendar.js?v=20261024c';
 const $=s=>document.querySelector(s);
 const repo='https://github.com/xuelixunhua/commodity-research-calendar';
 const storageKey='commodity-calendar-draft-v2';
@@ -53,7 +53,7 @@ function controls(){
   state.years=state.years.filter(y=>availableYears(data).includes(y));
   if(!state.years.length)state.years=recentYears(data,state.commodity);
   $('#page-title').innerHTML=`${esc(state.commodity)}<span>研究日历</span>`;
-  document.title=state.commodity+' · 商品研究日历';
+  document.title=state.commodity+' · 事件数据库';
   const icons={'电力':'ϟ','原油':'◒','甲醇':'◈','动力煤':'▰'};
   $('#commodities').innerHTML=data.commodities.map(c=>`<button data-commodity="${esc(c)}" class="${state.commodity===c?'active':''}" aria-current="${state.commodity===c?'page':'false'}"><span class="commodity-icon" aria-hidden="true">${icons[c]||'◦'}</span>${esc(c)}</button>`).join('');
   $('#modules').innerHTML=['all',...MODULES].map(m=>`<button data-module="${m}" class="${state.module===m?'active':''}" aria-pressed="${state.module===m}"><span class="module-dot"></span>${m==='all'?'全部因素':m}</button>`).join('');
