@@ -26179,6 +26179,57 @@
       "category": "市场与供需",
       "record_type": "季度观察",
       "region": "全国"
+    },
+    {
+      "id": "D2026-ln-spot-floor",
+      "title": "辽宁4.0规则将现货出清下限降至−100元/MWh",
+      "year": 2026,
+      "quarter": 1,
+      "date": "2026-01-01",
+      "period": "2026年1月起",
+      "status": "已发生",
+      "region": "辽宁",
+      "category": "政策",
+      "fact": "2026年1月1日起，辽宁4.0版市场规则实施，现货出清价格下限由0降至−100元/MWh，上限为1500元/MWh。",
+      "published": "2025-12-22",
+      "source": "辽宁省工信厅：4.0版配套实施细则；辽宁日报2026年1月14日",
+      "url": "https://gxt.ln.gov.cn/gxt/zfxxgk/zc/xzgfxwj/2025122215302440254/index.shtml",
+      "sources": [
+        {
+          "title": "辽宁日报：2026年1月1日起出清范围为−0.1至1.5元/千瓦时",
+          "url": "https://epaper.lnd.com.cn/lnrbepaper/pc/att/202601/14/79a67f95-3c04-47a7-ae28-2fc495958d7a.pdf"
+        }
+      ]
+    },
+    {
+      "id": "D2026-ln-renewable-mechanism",
+      "title": "辽宁新能源机制电价开始执行",
+      "year": 2026,
+      "quarter": 1,
+      "date": "2026-01-01",
+      "period": "2026年1月起",
+      "status": "已发生",
+      "region": "辽宁",
+      "category": "政策",
+      "fact": "2026年1月1日起，辽宁新能源上网电价市场化改革实施，在市场外建立新能源可持续发展价格结算机制，对纳入机制的电量开展差价结算；存量项目机制电价为0.3749元/千瓦时，增量项目通过竞价确定。",
+      "published": "",
+      "source": "辽宁省政府：深化新能源上网电价市场化改革实施方案",
+      "url": "https://www.ln.gov.cn/web/zwgkx/lnsrmzfgb/2025n/qk/2025n_dessq/bmwj/2025112009280272814/index.shtml"
+    },
+    {
+      "id": "D2026-ln-nuclear-settlement",
+      "title": "辽宁核电机制费用自4月开始体现",
+      "year": 2026,
+      "quarter": 2,
+      "date": "",
+      "period": "2026年4月起（费用体现）",
+      "status": "已发生",
+      "region": "辽宁",
+      "category": "政策",
+      "fact": "2026年4月起，辽宁核电机制费用在工商业用户费用数据中开始体现。核电市场外差价结算改变核电收入保障及用户侧系统运行费用构成。政策文件规定自2026年1月1日起实施，4月对应费用体现月份。",
+      "published": "2026-08-07",
+      "source": "辽宁市场信息分享（2026年8月7日，第12页）；辽发改价格〔2026〕142号",
+      "url": ""
     }
   ],
   "impacts": [
@@ -50639,6 +50690,48 @@
       "factor_id": "coal-power",
       "importance": "一般",
       "reason": "作为背景、观测或前置节点持续跟踪"
+    },
+    {
+      "id": "I-D2026-ln-spot-floor",
+      "event_id": "D2026-ln-spot-floor",
+      "commodity": "电力",
+      "region": "辽宁",
+      "factor_id": "power-policy",
+      "importance": "重点",
+      "topic": "市场规则与结算机制",
+      "impact": "负电价进入出清范围，改变低负荷与新能源大发时段的报价、发电及用电激励。",
+      "metric": "负价时段数量、分时出清价、负荷与新能源出力",
+      "condition": "价格下限放宽不等于各时段必然出现负电价。",
+      "window": "2026年1月起",
+      "reason": "改变报价边界、收入保障或结算关系，影响持续跨月。"
+    },
+    {
+      "id": "I-D2026-ln-renewable-mechanism",
+      "event_id": "D2026-ln-renewable-mechanism",
+      "commodity": "电力",
+      "region": "辽宁",
+      "factor_id": "power-policy",
+      "importance": "重点",
+      "topic": "市场规则与结算机制",
+      "impact": "机制电量获得差价结算保障，改变新能源收入结构及现货报价激励，并通过系统运行费用影响用户结算。",
+      "metric": "机制电量、差价结算金额、新能源报价与系统运行费用",
+      "condition": "存量与增量项目价格、机制电量范围分别适用；不能把机制电价当成全部上网电量的成交价。",
+      "window": "2026年1月起",
+      "reason": "改变报价边界、收入保障或结算关系，影响持续跨月。"
+    },
+    {
+      "id": "I-D2026-ln-nuclear-settlement",
+      "event_id": "D2026-ln-nuclear-settlement",
+      "commodity": "电力",
+      "region": "辽宁",
+      "factor_id": "power-policy",
+      "importance": "重点",
+      "topic": "市场规则与结算机制",
+      "impact": "核电机制电量按机制电价与市场交易均价进行差价结算，差额纳入系统运行费用，连接核电收入与工商业用户负担。",
+      "metric": "核电机制电量、差价电费、用户侧核电机制费用",
+      "condition": "4月依据分享材料的费用数据口径，不代表政策生效日；首笔结算及是否含此前月份追溯，需按账单区分。",
+      "window": "2026年4月起（费用体现）",
+      "reason": "改变报价边界、收入保障或结算关系，影响持续跨月。"
     }
   ],
   "factors": [
